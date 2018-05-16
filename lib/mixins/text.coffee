@@ -1,4 +1,3 @@
-LineWrapper = require '../line_wrapper'
 {number} = require '../object'
 
 module.exports =
@@ -29,20 +28,8 @@ module.exports =
     if options.wordSpacing
       text = text.replace(/\s{2,}/g, ' ')
 
-    # word wrapping
-    if options.width
-      wrapper = @_wrapper
-      unless wrapper
-        wrapper = new LineWrapper(this, options)
-        wrapper.on 'line', lineCallback
-
-      @_wrapper = if options.continued then wrapper else null
-      @_textOptions = if options.continued then options else null
-      wrapper.wrap text, options
-
     # render paragraphs as single lines
-    else
-      lineCallback line, options for line in text.split '\n'
+    lineCallback line, options for line in text.split '\n'
 
     return this
 
@@ -92,32 +79,8 @@ module.exports =
 
     flatten(list)
 
-    wrapper = new LineWrapper(this, options)
-    wrapper.on 'line', @_line.bind(this)
-
     level = 1
     i = 0
-    wrapper.on 'firstLine', =>
-      if (l = levels[i++]) isnt level
-        diff = itemIndent * (l - level)
-        @x += diff
-        wrapper.lineWidth -= diff
-        level = l
-
-      @circle @x - indent + r, @y + midLine, r
-      @fill()
-
-    wrapper.on 'sectionStart', =>
-      pos = indent + itemIndent * (level - 1)
-      @x += pos
-      wrapper.lineWidth -= pos
-
-    wrapper.on 'sectionEnd', =>
-      pos = indent + itemIndent * (level - 1)
-      @x -= pos
-      wrapper.lineWidth += pos
-
-    wrapper.wrap items.join('\n'), options
 
     return this
 
