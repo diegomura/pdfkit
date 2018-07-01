@@ -6,7 +6,6 @@ node-zlib/
 src/
 playground/
 build/
-js/
 demo/bundle.js
 *.html
 !demo/browser.html

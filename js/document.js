@@ -8,12 +8,8 @@ class PDFDocument extends stream.Readable {
     super()
 
     this.options = options;
-    // PDF version
     this.version = 1.3;
-
-    // Whether streams should be compressed
     this.compress = true
-
     this._pageBuffer = [];
     this._pageBufferStart = 0;
 
@@ -54,8 +50,7 @@ class PDFDocument extends stream.Readable {
       }
     }
 
-    // Write the header
-    // PDF version
+    // Write the header PDF version
     this._write(`%PDF-${this.version}`);
 
     // 4 binary chars, as recommended by the spec
@@ -80,11 +75,6 @@ class PDFDocument extends stream.Readable {
     const pages = this._root.data.Pages.data;
     pages.Kids.push(this.page.dictionary);
     pages.Count++;
-
-    // TODO: Remove coordinates
-    // reset x and y coordinates
-    this.x = 0;
-    this.y = 0;
 
     // flip PDF coordinate system so that the origin is in
     // the top left rather than the bottom left
