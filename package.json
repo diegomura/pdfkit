@@ -46,7 +46,7 @@
   "files": [
     "js"
   ],
-  "main": "js/document",
+  "main": "lib/document",
   "browserify": {
     "transform": [
       "brfs"
