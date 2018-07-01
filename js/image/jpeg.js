@@ -1,36 +1,47 @@
-/*
- * decaffeinate suggestions:
- * DS101: Remove unnecessary use of Array.from
- * DS102: Remove unnecessary code created because of implicit returns
- * DS205: Consider reworking code to avoid use of IIFEs
- * DS206: Consider reworking classes to avoid initClass
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
 var JPEG = (function() {
   let MARKERS = undefined;
   JPEG = class JPEG {
     static initClass() {
-      MARKERS = [0xFFC0, 0xFFC1, 0xFFC2, 0xFFC3, 0xFFC5, 0xFFC6, 0xFFC7,
-                 0xFFC8, 0xFFC9, 0xFFCA, 0xFFCB, 0xFFCC, 0xFFCD, 0xFFCE, 0xFFCF];
+      MARKERS = [
+        0xffc0,
+        0xffc1,
+        0xffc2,
+        0xffc3,
+        0xffc5,
+        0xffc6,
+        0xffc7,
+        0xffc8,
+        0xffc9,
+        0xffca,
+        0xffcb,
+        0xffcc,
+        0xffcd,
+        0xffce,
+        0xffcf,
+      ];
     }
 
     constructor(data, label) {
       let marker;
       this.data = data;
       this.label = label;
-      if (this.data.readUInt16BE(0) !== 0xFFD8) {
-        throw "SOI not found in JPEG";
+      if (this.data.readUInt16BE(0) !== 0xffd8) {
+        throw 'SOI not found in JPEG';
       }
 
       let pos = 2;
       while (pos < this.data.length) {
         marker = this.data.readUInt16BE(pos);
         pos += 2;
-        if (Array.from(MARKERS).includes(marker)) { break; }
+        if (Array.from(MARKERS).includes(marker)) {
+          break;
+        }
         pos += this.data.readUInt16BE(pos);
       }
 
-      if (!Array.from(MARKERS).includes(marker)) { throw "Invalid JPEG."; }
+      if (!Array.from(MARKERS).includes(marker)) {
+        throw 'Invalid JPEG.';
+      }
       pos += 2;
 
       this.bits = this.data[pos++];
@@ -41,17 +52,24 @@ var JPEG = (function() {
       pos += 2;
 
       const channels = this.data[pos++];
-      this.colorSpace = (() => { switch (channels) {
-        case 1: return 'DeviceGray';
-        case 3: return 'DeviceRGB';
-        case 4: return 'DeviceCMYK';
-      } })();
+      this.colorSpace = (() => {
+        switch (channels) {
+          case 1:
+            return 'DeviceGray';
+          case 3:
+            return 'DeviceRGB';
+          case 4:
+            return 'DeviceCMYK';
+        }
+      })();
 
       this.obj = null;
     }
 
     embed(document) {
-      if (this.obj) { return; }
+      if (this.obj) {
+        return;
+      }
 
       this.obj = document.ref({
         Type: 'XObject',
@@ -60,7 +78,7 @@ var JPEG = (function() {
         Width: this.width,
         Height: this.height,
         ColorSpace: this.colorSpace,
-        Filter: 'DCTDecode'
+        Filter: 'DCTDecode',
       });
 
       // add extra decode params for CMYK images. By swapping the
@@ -73,7 +91,7 @@ var JPEG = (function() {
       this.obj.end(this.data);
 
       // free memory
-      return this.data = null;
+      return (this.data = null);
     }
   };
   JPEG.initClass();

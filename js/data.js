@@ -10,7 +10,7 @@ class Data {
   }
 
   writeByte(byte) {
-    return this.data[this.pos++] = byte;
+    return (this.data[this.pos++] = byte);
   }
 
   byteAt(index) {
@@ -51,7 +51,9 @@ class Data {
   }
 
   writeInt32(val) {
-    if (val < 0) { val += 0x100000000; }
+    if (val < 0) {
+      val += 0x100000000;
+    }
     return this.writeUInt32(val);
   }
 
@@ -68,22 +70,26 @@ class Data {
 
   readInt16() {
     const int = this.readUInt16();
-
     if (int >= 0x8000) {
       return int - 0x10000;
     }
-
     return int;
   }
 
   writeInt16(val) {
-    if (val < 0) { val += 0x10000; }
+    if (val < 0) {
+      val += 0x10000;
+    }
     return this.writeUInt16(val);
   }
 
   readString(length) {
     const ret = [];
-    for (let i = 0, end = length, asc = 0 <= end; asc ? i < end : i > end; asc ? i++ : i--) {
+    for (
+      let i = 0, end = length, asc = 0 <= end;
+      asc ? i < end : i > end;
+      asc ? i++ : i--
+    ) {
       ret[i] = String.fromCharCode(this.readByte());
     }
 
@@ -91,8 +97,9 @@ class Data {
   }
 
   writeString(val) {
-    return __range__(0, val.length, false).map((i) =>
-      this.writeByte(val.charCodeAt(i)));
+    return __range__(0, val.length, false).map(i =>
+      this.writeByte(val.charCodeAt(i))
+    );
   }
 
   stringAt(pos, length) {
@@ -118,27 +125,32 @@ class Data {
     const b7 = this.readByte();
     const b8 = this.readByte();
 
-    if (b1 & 0x80) { // sign -> avoid overflow
+    if (b1 & 0x80) {
+      // sign -> avoid overflow
       return (
-        ((b1 ^ 0xff) * 0x100000000000000) +
-        ((b2 ^ 0xff) * 0x1000000000000) +
-        ((b3 ^ 0xff) * 0x10000000000) +
-        ((b4 ^ 0xff) * 0x100000000) +
-        ((b5 ^ 0xff) * 0x1000000) +
-        ((b6 ^ 0xff) * 0x10000) +
-        ((b7 ^ 0xff) * 0x100) +
-        (b8 ^ 0xff) + 1
-      ) * -1;
+        ((b1 ^ 0xff) * 0x100000000000000 +
+          (b2 ^ 0xff) * 0x1000000000000 +
+          (b3 ^ 0xff) * 0x10000000000 +
+          (b4 ^ 0xff) * 0x100000000 +
+          (b5 ^ 0xff) * 0x1000000 +
+          (b6 ^ 0xff) * 0x10000 +
+          (b7 ^ 0xff) * 0x100 +
+          (b8 ^ 0xff) +
+          1) *
+        -1
+      );
     }
 
-    return (b1 * 0x100000000000000) +
-       (b2 * 0x1000000000000) +
-       (b3 * 0x10000000000) +
-       (b4 * 0x100000000) +
-       (b5 * 0x1000000) +
-       (b6 * 0x10000) +
-       (b7 * 0x100) +
-       b8;
+    return (
+      b1 * 0x100000000000000 +
+      b2 * 0x1000000000000 +
+      b3 * 0x10000000000 +
+      b4 * 0x100000000 +
+      b5 * 0x1000000 +
+      b6 * 0x10000 +
+      b7 * 0x100 +
+      b8
+    );
   }
 
   writeLongLong(val) {
@@ -168,7 +180,11 @@ class Data {
 
   read(bytes) {
     const buf = [];
-    for (let i = 0, end = bytes, asc = 0 <= end; asc ? i < end : i > end; asc ? i++ : i--) {
+    for (
+      let i = 0, end = bytes, asc = 0 <= end;
+      asc ? i < end : i > end;
+      asc ? i++ : i--
+    ) {
       buf.push(this.readByte());
     }
 
@@ -176,8 +192,7 @@ class Data {
   }
 
   write(bytes) {
-    return Array.from(bytes).map((byte) =>
-      this.writeByte(byte));
+    return Array.from(bytes).map(byte => this.writeByte(byte));
   }
 }
 

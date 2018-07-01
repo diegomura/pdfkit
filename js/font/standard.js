@@ -1,24 +1,21 @@
-/*
- * decaffeinate suggestions:
- * DS001: Remove Babel/TypeScript constructor workaround
- * DS101: Remove unnecessary use of Array.from
- * DS102: Remove unnecessary code created because of implicit returns
- * DS206: Consider reworking classes to avoid initClass
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
 const AFMFont = require('./afm');
 const PDFFont = require('../font');
 const fs = require('fs');
 
 class StandardFont extends PDFFont {
   constructor(document, name, id) {
-    super()
+    super();
 
     this.document = document;
     this.name = name;
     this.id = id;
     this.font = new AFMFont(STANDARD_FONTS[this.name]());
-    ({ascender: this.ascender,descender: this.descender,bbox: this.bbox,lineGap: this.lineGap} = this.font);
+    ({
+      ascender: this.ascender,
+      descender: this.descender,
+      bbox: this.bbox,
+      lineGap: this.lineGap,
+    } = this.font);
   }
 
   embed() {
@@ -26,7 +23,7 @@ class StandardFont extends PDFFont {
       Type: 'Font',
       BaseFont: this.name,
       Subtype: 'Type1',
-      Encoding: 'WinAnsiEncoding'
+      Encoding: 'WinAnsiEncoding',
     };
 
     return this.dictionary.end();
@@ -44,7 +41,7 @@ class StandardFont extends PDFFont {
         yAdvance: 0,
         xOffset: 0,
         yOffset: 0,
-        advanceWidth: this.font.widthOfGlyph(glyph)
+        advanceWidth: this.font.widthOfGlyph(glyph),
       });
     }
 
@@ -54,7 +51,7 @@ class StandardFont extends PDFFont {
   encodeGlyphs(glyphs) {
     const res = [];
     for (let glyph of Array.from(glyphs)) {
-      res.push((`00${glyph.id.toString(16)}`).slice(-2));
+      res.push(`00${glyph.id.toString(16)}`.slice(-2));
     }
 
     return res;
@@ -76,23 +73,78 @@ class StandardFont extends PDFFont {
   static isStandardFont(name) {
     return name in STANDARD_FONTS;
   }
-};
+}
 
 const STANDARD_FONTS = {
-  "Courier"() { return fs.readFileSync(__dirname + "/../font/data/Courier.afm", 'utf8'); },
-  "Courier-Bold"() { return fs.readFileSync(__dirname + "/../font/data/Courier-Bold.afm", 'utf8'); },
-  "Courier-Oblique"() { return fs.readFileSync(__dirname + "/../font/data/Courier-Oblique.afm", 'utf8'); },
-  "Courier-BoldOblique"() { return fs.readFileSync(__dirname + "/../font/data/Courier-BoldOblique.afm", 'utf8'); },
-  "Helvetica"() { return fs.readFileSync(__dirname + "/../font/data/Helvetica.afm", 'utf8'); },
-  "Helvetica-Bold"() { return fs.readFileSync(__dirname + "/../font/data/Helvetica-Bold.afm", 'utf8'); },
-  "Helvetica-Oblique"() { return fs.readFileSync(__dirname + "/../font/data/Helvetica-Oblique.afm", 'utf8'); },
-  "Helvetica-BoldOblique"() { return fs.readFileSync(__dirname + "/../font/data/Helvetica-BoldOblique.afm", 'utf8'); },
-  "Times-Roman"() { return fs.readFileSync(__dirname + "/../font/data/Times-Roman.afm", 'utf8'); },
-  "Times-Bold"() { return fs.readFileSync(__dirname + "/../font/data/Times-Bold.afm", 'utf8'); },
-  "Times-Italic"() { return fs.readFileSync(__dirname + "/../font/data/Times-Italic.afm", 'utf8'); },
-  "Times-BoldItalic"() { return fs.readFileSync(__dirname + "/../font/data/Times-BoldItalic.afm", 'utf8'); },
-  "Symbol"() { return fs.readFileSync(__dirname + "/../font/data/Symbol.afm", 'utf8'); },
-  "ZapfDingbats"() { return fs.readFileSync(__dirname + "/../font/data/ZapfDingbats.afm", 'utf8'); }
+  Courier() {
+    return fs.readFileSync(__dirname + '/../font/data/Courier.afm', 'utf8');
+  },
+  'Courier-Bold'() {
+    return fs.readFileSync(
+      __dirname + '/../font/data/Courier-Bold.afm',
+      'utf8'
+    );
+  },
+  'Courier-Oblique'() {
+    return fs.readFileSync(
+      __dirname + '/../font/data/Courier-Oblique.afm',
+      'utf8'
+    );
+  },
+  'Courier-BoldOblique'() {
+    return fs.readFileSync(
+      __dirname + '/../font/data/Courier-BoldOblique.afm',
+      'utf8'
+    );
+  },
+  Helvetica() {
+    return fs.readFileSync(__dirname + '/../font/data/Helvetica.afm', 'utf8');
+  },
+  'Helvetica-Bold'() {
+    return fs.readFileSync(
+      __dirname + '/../font/data/Helvetica-Bold.afm',
+      'utf8'
+    );
+  },
+  'Helvetica-Oblique'() {
+    return fs.readFileSync(
+      __dirname + '/../font/data/Helvetica-Oblique.afm',
+      'utf8'
+    );
+  },
+  'Helvetica-BoldOblique'() {
+    return fs.readFileSync(
+      __dirname + '/../font/data/Helvetica-BoldOblique.afm',
+      'utf8'
+    );
+  },
+  'Times-Roman'() {
+    return fs.readFileSync(__dirname + '/../font/data/Times-Roman.afm', 'utf8');
+  },
+  'Times-Bold'() {
+    return fs.readFileSync(__dirname + '/../font/data/Times-Bold.afm', 'utf8');
+  },
+  'Times-Italic'() {
+    return fs.readFileSync(
+      __dirname + '/../font/data/Times-Italic.afm',
+      'utf8'
+    );
+  },
+  'Times-BoldItalic'() {
+    return fs.readFileSync(
+      __dirname + '/../font/data/Times-BoldItalic.afm',
+      'utf8'
+    );
+  },
+  Symbol() {
+    return fs.readFileSync(__dirname + '/../font/data/Symbol.afm', 'utf8');
+  },
+  ZapfDingbats() {
+    return fs.readFileSync(
+      __dirname + '/../font/data/ZapfDingbats.afm',
+      'utf8'
+    );
+  },
 };
 
 module.exports = StandardFont;

@@ -8,7 +8,9 @@ class PDFReference extends stream.Writable {
     this.finalize = this.finalize.bind(this);
     this.document = document;
     this.id = id;
-    if (data == null) { data = {}; }
+    if (data == null) {
+      data = {};
+    }
     this.data = data;
 
     this.gen = 0;
@@ -24,7 +26,7 @@ class PDFReference extends stream.Writable {
     this.deflate = zlib.createDeflate();
     this.deflate.on('data', chunk => {
       this.chunks.push(chunk);
-      return this.data.Length += chunk.length;
+      return (this.data.Length += chunk.length);
     });
 
     return this.deflate.on('end', this.finalize);
@@ -36,10 +38,14 @@ class PDFReference extends stream.Writable {
     }
 
     this.uncompressedLength += chunk.length;
-    if (this.data.Length == null) { this.data.Length = 0; }
+    if (this.data.Length == null) {
+      this.data.Length = 0;
+    }
 
     if (this.compress) {
-      if (!this.deflate) { this.initDeflate(); }
+      if (!this.deflate) {
+        this.initDeflate();
+      }
       this.deflate.write(chunk);
     } else {
       this.chunks.push(chunk);

@@ -1,9 +1,3 @@
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * DS207: Consider shorter variations of null checks
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
 const PDFFont = require('../font');
 
 module.exports = {
@@ -30,18 +24,22 @@ module.exports = {
     }
 
     // check registered fonts if src is a string
-    if ((typeof src === 'string') && this._registeredFonts[src]) {
+    if (typeof src === 'string' && this._registeredFonts[src]) {
       cacheKey = src;
-      ({src, family} = this._registeredFonts[src]);
+      ({ src, family } = this._registeredFonts[src]);
     } else {
       cacheKey = family || src;
-      if (typeof cacheKey !== 'string') { cacheKey = null; }
+      if (typeof cacheKey !== 'string') {
+        cacheKey = null;
+      }
     }
 
-    if (size != null) { this.fontSize(size); }
+    if (size != null) {
+      this.fontSize(size);
+    }
 
     // fast path: check if the font is already in the PDF
-    if (font = this._fontFamilies[cacheKey]) {
+    if ((font = this._fontFamilies[cacheKey])) {
       this._font = font;
       return this;
     }
@@ -52,7 +50,7 @@ module.exports = {
 
     // check for existing font familes with the same name already in the PDF
     // useful if the font was passed as a buffer
-    if (font = this._fontFamilies[this._font.name]) {
+    if ((font = this._fontFamilies[this._font.name])) {
       this._font = font;
       return this;
     }
@@ -75,16 +73,18 @@ module.exports = {
   },
 
   currentLineHeight(includeGap) {
-    if (includeGap == null) { includeGap = false; }
+    if (includeGap == null) {
+      includeGap = false;
+    }
     return this._font.lineHeight(this._fontSize, includeGap);
   },
 
   registerFont(name, src, family) {
     this._registeredFonts[name] = {
       src,
-      family
+      family,
     };
 
     return this;
-  }
+  },
 };

@@ -5,11 +5,11 @@ const PDFPage = require('./page');
 
 class PDFDocument extends stream.Readable {
   constructor(options = {}) {
-    super()
+    super();
 
     this.options = options;
     this.version = 1.3;
-    this.compress = true
+    this.compress = true;
     this._pageBuffer = [];
     this._pageBufferStart = 0;
 
@@ -24,7 +24,9 @@ class PDFDocument extends stream.Readable {
       Pages: this.ref({
         Type: 'Pages',
         Count: 0,
-        Kids: []})});
+        Kids: [],
+      }),
+    });
 
     // The current page
     this.page = null;
@@ -40,7 +42,7 @@ class PDFDocument extends stream.Readable {
     this.info = {
       Producer: 'PDFKit',
       Creator: 'PDFKit',
-      CreationDate: new Date()
+      CreationDate: new Date(),
     };
 
     if (this.options.info) {
@@ -54,7 +56,7 @@ class PDFDocument extends stream.Readable {
     this._write(`%PDF-${this.version}`);
 
     // 4 binary chars, as recommended by the spec
-    this._write("%\xFF\xFF\xFF\xFF");
+    this._write('%\xFF\xFF\xFF\xFF');
 
     // Add the first page
     if (this.options.autoFirstPage !== false) {
@@ -64,8 +66,13 @@ class PDFDocument extends stream.Readable {
 
   addPage(options) {
     // end the current page if needed
-    if (options == null) { ({ options } = this); }
-    if (!this.options.bufferPages) { this.flushPages(); }
+    if (options == null) {
+      ({ options } = this);
+    }
+
+    if (!this.options.bufferPages) {
+      this.flushPages();
+    }
 
     // create a page object
     this.page = new PDFPage(this, options);
@@ -81,8 +88,6 @@ class PDFDocument extends stream.Readable {
     this._ctm = [1, 0, 0, 1, 0, 0];
     this.transform(1, 0, 0, -1, 0, this.page.height);
 
-    this.emit('pageAdded');
-
     return this;
   }
 
@@ -95,7 +100,6 @@ class PDFDocument extends stream.Readable {
     for (let page of Array.from(pages)) {
       page.end();
     }
-
   }
 
   ref(data) {
@@ -105,8 +109,9 @@ class PDFDocument extends stream.Readable {
     return ref;
   }
 
-  _read() {}
-      // do nothing, but this method is required by node
+  _read() {
+    // do nothing, but this method is required by node
+  }
 
   _write(data) {
     if (!Buffer.isBuffer(data)) {
@@ -114,7 +119,7 @@ class PDFDocument extends stream.Readable {
     }
 
     this.push(data);
-    return this._offset += data.length;
+    return (this._offset += data.length);
   }
 
   addContent(data) {
@@ -124,9 +129,9 @@ class PDFDocument extends stream.Readable {
 
   _refEnd(ref) {
     this._offsets[ref.id - 1] = ref.offset;
-    if ((--this._waiting === 0) && this._ended) {
+    if (--this._waiting === 0 && this._ended) {
       this._finalize();
-      return this._ended = false;
+      return (this._ended = false);
     }
   }
 
@@ -155,29 +160,30 @@ class PDFDocument extends stream.Readable {
     if (this._waiting === 0) {
       return this._finalize();
     } else {
-      return this._ended = true;
+      return (this._ended = true);
     }
   }
 
   _finalize(fn) {
     // generate xref
     const xRefOffset = this._offset;
-    this._write("xref");
+    this._write('xref');
     this._write(`0 ${this._offsets.length + 1}`);
-    this._write("0000000000 65535 f ");
+    this._write('0000000000 65535 f ');
 
     for (let offset of Array.from(this._offsets)) {
-      offset = (`0000000000${offset}`).slice(-10);
+      offset = `0000000000${offset}`.slice(-10);
       this._write(offset + ' 00000 n ');
     }
 
     // trailer
     this._write('trailer');
-    this._write(PDFObject.convert({
-      Size: this._offsets.length + 1,
-      Root: this._root,
-      Info: this._info
-    })
+    this._write(
+      PDFObject.convert({
+        Size: this._offsets.length + 1,
+        Root: this._root,
+        Info: this._info,
+      })
     );
 
     this._write('startxref');
@@ -189,16 +195,16 @@ class PDFDocument extends stream.Readable {
   }
 
   toString() {
-    return "[object PDFDocument]";
+    return '[object PDFDocument]';
   }
-};
+}
 
 mixin = methods => {
   return (() => {
     const result = [];
     for (let name in methods) {
       const method = methods[name];
-      result.push(PDFDocument.prototype[name] = method);
+      result.push((PDFDocument.prototype[name] = method));
     }
     return result;
   })();

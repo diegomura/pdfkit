@@ -1,27 +1,23 @@
-/*
- * decaffeinate suggestions:
- * DS101: Remove unnecessary use of Array.from
- * DS102: Remove unnecessary code created because of implicit returns
- * DS205: Consider reworking code to avoid use of IIFEs
- * DS207: Consider shorter variations of null checks
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
 module.exports = {
   initColor() {
     // The opacity dictionaries
     this._opacityRegistry = {};
     this._opacityCount = 0;
-    return this._gradCount = 0;
+    return (this._gradCount = 0);
   },
 
   _normalizeColor(color) {
     let part;
     if (typeof color === 'string') {
       if (color.charAt(0) === '#') {
-        if (color.length === 4) { color = color.replace(/#([0-9A-F])([0-9A-F])([0-9A-F])/i, "#$1$1$2$2$3$3"); }
+        if (color.length === 4) {
+          color = color.replace(
+            /#([0-9A-F])([0-9A-F])([0-9A-F])/i,
+            '#$1$1$2$2$3$3'
+          );
+        }
         const hex = parseInt(color.slice(1), 16);
         color = [hex >> 16, (hex >> 8) & 0xff, hex & 0xff];
-
       } else if (namedColors[color]) {
         color = namedColors[color];
       }
@@ -30,21 +26,23 @@ module.exports = {
     if (Array.isArray(color)) {
       // RGB
       if (color.length === 3) {
-        color = ((() => {
+        color = (() => {
           const result = [];
-          for (part of Array.from(color)) {             result.push(part / 255);
+          for (part of Array.from(color)) {
+            result.push(part / 255);
           }
           return result;
-        })());
+        })();
 
-      // CMYK
+        // CMYK
       } else if (color.length === 4) {
-        color = ((() => {
+        color = (() => {
           const result1 = [];
-          for (part of Array.from(color)) {             result1.push(part / 100);
+          for (part of Array.from(color)) {
+            result1.push(part / 100);
           }
           return result1;
-        })());
+        })();
       }
 
       return color;
@@ -55,7 +53,9 @@ module.exports = {
 
   _setColor(color, stroke) {
     color = this._normalizeColor(color);
-    if (!color) { return false; }
+    if (!color) {
+      return false;
+    }
 
     const op = stroke ? 'SCN' : 'scn';
 
@@ -75,7 +75,9 @@ module.exports = {
 
   fillColor(color, opacity) {
     const set = this._setColor(color, false);
-    if (set) { this.fillOpacity(opacity); }
+    if (set) {
+      this.fillOpacity(opacity);
+    }
 
     // save this for text wrapper, which needs to reset
     // the fill color on new pages
@@ -85,52 +87,63 @@ module.exports = {
 
   strokeColor(color, opacity) {
     const set = this._setColor(color, true);
-    if (set) { this.strokeOpacity(opacity); }
+    if (set) {
+      this.strokeOpacity(opacity);
+    }
     return this;
   },
 
   opacity(opacity) {
-     this._doOpacity(opacity, opacity);
-     return this;
-   },
+    this._doOpacity(opacity, opacity);
+    return this;
+  },
 
   fillOpacity(opacity) {
-     this._doOpacity(opacity, null);
-     return this;
-   },
+    this._doOpacity(opacity, null);
+    return this;
+  },
 
   strokeOpacity(opacity) {
-     this._doOpacity(null, opacity);
-     return this;
-   },
+    this._doOpacity(null, opacity);
+    return this;
+  },
 
   _doOpacity(fillOpacity, strokeOpacity) {
-     let dictionary, name;
-     if ((fillOpacity == null) && (strokeOpacity == null)) { return; }
+    let dictionary, name;
+    if (fillOpacity == null && strokeOpacity == null) {
+      return;
+    }
 
-     if (fillOpacity != null) { fillOpacity = Math.max(0, Math.min(1, fillOpacity)); }
-     if (strokeOpacity != null) { strokeOpacity = Math.max(0, Math.min(1, strokeOpacity)); }
-     const key = `${fillOpacity}_${strokeOpacity}`;
+    if (fillOpacity != null) {
+      fillOpacity = Math.max(0, Math.min(1, fillOpacity));
+    }
+    if (strokeOpacity != null) {
+      strokeOpacity = Math.max(0, Math.min(1, strokeOpacity));
+    }
+    const key = `${fillOpacity}_${strokeOpacity}`;
 
-     if (this._opacityRegistry[key]) {
-       [dictionary, name] = Array.from(this._opacityRegistry[key]);
-     } else {
-       dictionary =
-         {Type: 'ExtGState'};
+    if (this._opacityRegistry[key]) {
+      [dictionary, name] = Array.from(this._opacityRegistry[key]);
+    } else {
+      dictionary = { Type: 'ExtGState' };
 
-       if (fillOpacity != null) { dictionary.ca = fillOpacity; }
-       if (strokeOpacity != null) { dictionary.CA = strokeOpacity; }
+      if (fillOpacity != null) {
+        dictionary.ca = fillOpacity;
+      }
+      if (strokeOpacity != null) {
+        dictionary.CA = strokeOpacity;
+      }
 
-       dictionary = this.ref(dictionary);
-       dictionary.end();
-       const id = ++this._opacityCount;
-       name = `Gs${id}`;
-       this._opacityRegistry[key] = [dictionary, name];
-     }
+      dictionary = this.ref(dictionary);
+      dictionary.end();
+      const id = ++this._opacityCount;
+      name = `Gs${id}`;
+      this._opacityRegistry[key] = [dictionary, name];
+    }
 
-     this.page.ext_gstates[name] = dictionary;
-     return this.addContent(`/${name} gs`);
-   }
+    this.page.ext_gstates[name] = dictionary;
+    return this.addContent(`/${name} gs`);
+  },
 };
 
 var namedColors = {
@@ -280,5 +293,5 @@ var namedColors = {
   white: [255, 255, 255],
   whitesmoke: [245, 245, 245],
   yellow: [255, 255, 0],
-  yellowgreen: [154, 205, 50]
+  yellowgreen: [154, 205, 50],
 };

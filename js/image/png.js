@@ -1,9 +1,3 @@
-/*
- * decaffeinate suggestions:
- * DS101: Remove unnecessary use of Array.from
- * DS102: Remove unnecessary code created because of implicit returns
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
 const zlib = require('zlib');
 const PNG = require('png-js');
 
@@ -19,7 +13,9 @@ class PNGImage {
 
   embed(document) {
     this.document = document;
-    if (this.obj) { return; }
+    if (this.obj) {
+      return;
+    }
 
     this.obj = this.document.ref({
       Type: 'XObject',
@@ -27,7 +23,7 @@ class PNGImage {
       BitsPerComponent: this.image.bits,
       Width: this.width,
       Height: this.height,
-      Filter: 'FlateDecode'
+      Filter: 'FlateDecode',
     });
 
     if (!this.image.hasAlphaChannel) {
@@ -35,7 +31,7 @@ class PNGImage {
         Predictor: 15,
         Colors: this.image.colors,
         BitsPerComponent: this.image.bits,
-        Columns: this.width
+        Columns: this.width,
       });
 
       this.obj.data['DecodeParms'] = params;
@@ -50,7 +46,12 @@ class PNGImage {
       palette.end(new Buffer(this.image.palette));
 
       // build the color space array for the image
-      this.obj.data['ColorSpace'] = ['Indexed', 'DeviceRGB', (this.image.palette.length / 3) - 1, palette];
+      this.obj.data['ColorSpace'] = [
+        'Indexed',
+        'DeviceRGB',
+        this.image.palette.length / 3 - 1,
+        palette,
+      ];
     }
 
     // For PNG color types 0, 2 and 3, the transparency data is stored in
@@ -59,8 +60,7 @@ class PNGImage {
       // Use Color Key Masking (spec section 4.8.5)
       // An array with N elements, where N is two times the number of color components.
       const val = this.image.transparency.greyscale;
-      return this.obj.data['Mask'] = [val, val];
-
+      return (this.obj.data['Mask'] = [val, val]);
     } else if (this.image.transparency.rgb) {
       // Use Color Key Masking (spec section 4.8.5)
       // An array with N elements, where N is two times the number of color components.
@@ -70,19 +70,16 @@ class PNGImage {
         mask.push(x, x);
       }
 
-      return this.obj.data['Mask'] = mask;
-
+      return (this.obj.data['Mask'] = mask);
     } else if (this.image.transparency.indexed) {
       // Create a transparency SMask for the image based on the data
       // in the PLTE and tRNS sections. See below for details on SMasks.
       return this.loadIndexedAlphaChannel();
-
     } else if (this.image.hasAlphaChannel) {
       // For PNG color types 4 and 6, the transparency data is stored as a alpha
       // channel mixed in with the main image data. Separate this data out into an
       // SMask object and store it separately in the PDF.
       return this.splitAlphaChannel();
-
     } else {
       return this.finalize();
     }
@@ -98,7 +95,8 @@ class PNGImage {
         BitsPerComponent: 8,
         Filter: 'FlateDecode',
         ColorSpace: 'DeviceGray',
-        Decode: [0, 1]});
+        Decode: [0, 1],
+      });
 
       sMask.end(this.alphaChannel);
       this.obj.data['SMask'] = sMask;
@@ -109,7 +107,7 @@ class PNGImage {
 
     // free memory
     this.image = null;
-    return this.imgData = null;
+    return (this.imgData = null);
   }
 
   splitAlphaChannel() {
@@ -120,7 +118,7 @@ class PNGImage {
       const imgData = new Buffer(pixelCount * colorByteSize);
       const alphaChannel = new Buffer(pixelCount);
 
-      let i = (p = (a = 0));
+      let i = (p = a = 0);
       const len = pixels.length;
       while (i < len) {
         imgData[p++] = pixels[i++];
@@ -132,14 +130,22 @@ class PNGImage {
       let done = 0;
       zlib.deflate(imgData, (err, imgData1) => {
         this.imgData = imgData1;
-        if (err) { throw err; }
-        if (++done === 2) { return this.finalize(); }
+        if (err) {
+          throw err;
+        }
+        if (++done === 2) {
+          return this.finalize();
+        }
       });
 
       return zlib.deflate(alphaChannel, (err, alphaChannel1) => {
         this.alphaChannel = alphaChannel1;
-        if (err) { throw err; }
-        if (++done === 2) { return this.finalize(); }
+        if (err) {
+          throw err;
+        }
+        if (++done === 2) {
+          return this.finalize();
+        }
       });
     });
   }
@@ -156,7 +162,9 @@ class PNGImage {
 
       return zlib.deflate(alphaChannel, (err, alphaChannel1) => {
         this.alphaChannel = alphaChannel1;
-        if (err) { throw err; }
+        if (err) {
+          throw err;
+        }
         return this.finalize();
       });
     });
