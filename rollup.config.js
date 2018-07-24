@@ -83,9 +83,39 @@ const browserProdConfig = Object.assign({}, browserConfig, {
   ),
 })
 
+const nativePaths = {
+  stream: 'react-native-stream',
+  zlib: 'react-zlib-js'
+}
+
+const nativeConfig = Object.assign({}, configBase, {
+  output: [
+    getESM({ file: 'dist/pdfkit.native.es.js', paths: nativePaths }),
+    getCJS({ file: 'dist/pdfkit.native.cjs.js', paths: nativePaths }),
+  ],
+  plugins: configBase.plugins.concat(
+    replace({
+      BROWSER: JSON.stringify(true)
+    }),
+    ignore(['fs'])
+  )
+})
+
+const nativeProdConfig = Object.assign({}, nativeConfig, {
+  output: [
+    getESM({ file: 'dist/pdfkit.native.es.min.js', paths: nativePaths }),
+    getCJS({ file: 'dist/pdfkit.native.cjs.min.js', paths: nativePaths }),
+  ],
+  plugins: nativeConfig.plugins.concat(
+    uglify()
+  ),
+})
+
 export default [
   serverConfig,
   serverProdConfig,
   browserConfig,
-  browserProdConfig
+  browserProdConfig,
+  nativeConfig,
+  nativeProdConfig
 ]

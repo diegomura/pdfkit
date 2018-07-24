@@ -8,6 +8,7 @@
     "./dist/pdfkit.es.js": "./dist/pdfkit.browser.es.js",
     "./dist/pdfkit.cjs.js": "./dist/pdfkit.browser.cjs.js"
   },
+  "react-native": "./dist/pdfkit.native.cjs.js",
   "author": {
     "name": "Devon Govett",
     "email": "devongovett@gmail.com",
@@ -24,8 +25,9 @@
   ],
   "dependencies": {
     "@react-pdf/fontkit": "^1.11.0",
-    "@react-pdf/png-js": "^1.0.0",
-    "lz-string": "^1.4.4"
+    "lz-string": "^1.4.4",
+    "react-native-stream": "^0.1.9",
+    "react-zlib-js": "^1.0.4"
   },
   "devDependencies": {
     "babel-plugin-external-helpers": "^6.22.0",
