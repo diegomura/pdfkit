@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = https://github.com/matt-way/jsBinarySchemaParser.git
+	branch = master
+	commit = 7169e72d1223b3479613f59513691843bedbdc17
+	parent = ed0cbb4a806db1e11dafc74d3bc0694cfc7d5405
+	method = merge
+	cmdver = 0.4.0
