@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = https://github.com/mathatan/gifuct-js.git
+	branch = master
+	commit = 961f796dabb1561a0101c310655ec2658beb1cd5
+	parent = 49f2c5c9a32da0247617fe8ef1e2b52b951327ae
+	method = merge
+	cmdver = 0.4.0
