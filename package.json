@@ -2,36 +2,27 @@
   "name": "@react-pdf/pdfkit",
   "version": "1.2.0",
   "description": "A PDF generation library for Node.js",
-<<<<<<< HEAD
   "main": "dist/pdfkit.cjs.js",
   "module": "dist/pdfkit.es.js",
   "browser": {
     "./dist/pdfkit.es.js": "./dist/pdfkit.browser.es.js",
     "./dist/pdfkit.cjs.js": "./dist/pdfkit.browser.cjs.js"
   },
-=======
-  "keywords": [
-    "pdf",
-    "pdf writer",
-    "pdf generator",
-    "graphics",
-    "document",
-    "vector"
-  ],
-  "version": "0.9.0",
-  "homepage": "http://pdfkit.org/",
->>>>>>> upstream/master
   "author": {
     "name": "Devon Govett",
     "email": "devongovett@gmail.com",
     "url": "http://badassjs.com/"
   },
-<<<<<<< HEAD
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "rimraf ./dist && rollup -c",
-    "prepublish": "npm run build",
     "prebuild": "node ./lib/font/data/compressData.js",
     "postbuild": "rimraf ./lib/font/data/*.b64.afm",
+    "prepublishOnly": "npm run build",
+    "demo": "cd demo && node test.js",
+    "prettier": "prettier {lib,tests,demo,docs}/**/*.js",
     "browser-demo": "browserify demo/browser.js > demo/bundle.js",
     "pdf-guide": "node docs/generate.js",
     "website": "node docs/generate_website.js",
@@ -40,16 +31,6 @@
     "test:integration": "jest integration/ -i",
     "test:unit": "jest unit/ -i"
   },
-  "files": [
-    "dist"
-  ],
-=======
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/foliojs/pdfkit.git"
-  },
-  "bugs": "https://github.com/foliojs/pdfkit/issues",
->>>>>>> upstream/master
   "devDependencies": {
     "babel-core": "^6.26.3",
     "babel-jest": "^23.6.0",
@@ -66,8 +47,8 @@
     "jade": "~1.1.5",
     "jest": "^23.4.2",
     "markdown": "~0.5.0",
-<<<<<<< HEAD
     "rimraf": "^2.6.2",
+    "prettier": "1.15.3",
     "rollup": "^0.52.2",
     "rollup-plugin-babel": "3",
     "rollup-plugin-bundle-size": "https://github.com/vimeo/rollup-plugin-bundle-size",
@@ -77,11 +58,6 @@
     "rollup-plugin-replace": "^1.1.1",
     "rollup-plugin-string": "^2.0.2",
     "rollup-plugin-uglify": "^3.0.0",
-=======
-    "prettier": "1.15.3",
-    "rollup": "^0.65.0",
-    "rollup-plugin-babel": "^3.0.7",
->>>>>>> upstream/master
     "rollup-plugin-cpy": "^1.0.0"
   },
   "dependencies": {
@@ -92,24 +68,6 @@
     "linebreak": "^0.3.0",
     "saslprep": "1.0.1"
   },
-<<<<<<< HEAD
-=======
-  "scripts": {
-    "prepublishOnly": "npm run build",
-    "build": "rollup -c",
-    "demo": "cd demo && node test.js",
-    "browser-demo": "browserify demo/browser.js > demo/bundle.js",
-    "pdf-guide": "node docs/generate.js",
-    "website": "node docs/generate_website.js",
-    "docs": "npm run pdf-guide && npm run website && npm run browser-demo",
-    "prettier": "prettier {lib,tests,demo,docs}/**/*.js",
-    "test": "jest -i",
-    "test:integration": "jest integration/ -i",
-    "test:unit": "jest unit/ -i"
-  },
-  "main": "js/pdfkit.js",
-  "module": "js/pdfkit.es5.js",
-  "esnext": "js/pdfkit.esnext.js",
   "browserify": {
     "transform": [
       "brfs"
@@ -118,7 +76,6 @@
   "engine": [
     "node >= v6.0.0"
   ],
->>>>>>> upstream/master
   "jest": {
     "testPathIgnorePatterns": [
       "/node_modules/",

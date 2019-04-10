@@ -12,8 +12,5 @@ dist
 *.b64.afm
 .vscode
 coverage
-<<<<<<< HEAD
-=======
 tests/integration/__pdfs__
 tests/integration/pdfmake/__pdfs__
->>>>>>> upstream/master
