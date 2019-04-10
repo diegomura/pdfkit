@@ -12,3 +12,5 @@ dist
 *.b64.afm
 .vscode
 coverage
+tests/integration/__pdfs__
+tests/integration/pdfmake/__pdfs__

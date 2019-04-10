@@ -13,11 +13,16 @@
     "email": "devongovett@gmail.com",
     "url": "http://badassjs.com/"
   },
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "rimraf ./dist && rollup -c",
-    "prepublish": "npm run build",
     "prebuild": "node ./lib/font/data/compressData.js",
     "postbuild": "rimraf ./lib/font/data/*.b64.afm",
+    "prepublishOnly": "npm run build",
+    "demo": "cd demo && node test.js",
+    "prettier": "prettier {lib,tests,demo,docs}/**/*.js",
     "browser-demo": "browserify demo/browser.js > demo/bundle.js",
     "pdf-guide": "node docs/generate.js",
     "website": "node docs/generate_website.js",
@@ -26,9 +31,6 @@
     "test:integration": "jest integration/ -i",
     "test:unit": "jest unit/ -i"
   },
-  "files": [
-    "dist"
-  ],
   "devDependencies": {
     "babel-core": "^6.26.3",
     "babel-jest": "^23.6.0",
@@ -38,7 +40,7 @@
     "blob-stream": "^0.1.2",
     "brace": "^0.2.1",
     "brfs": "~2.0.1",
-    "browserify": "^13.3.0",
+    "browserify": "^16.2.3",
     "codemirror": "~3.20.0",
     "eslint": "^5.3.0",
     "iconv-lite": "^0.4.13",
@@ -46,6 +48,7 @@
     "jest": "^23.4.2",
     "markdown": "~0.5.0",
     "rimraf": "^2.6.2",
+    "prettier": "1.15.3",
     "rollup": "^0.52.2",
     "rollup-plugin-babel": "3",
     "rollup-plugin-bundle-size": "https://github.com/vimeo/rollup-plugin-bundle-size",
@@ -65,6 +68,14 @@
     "linebreak": "^0.3.0",
     "saslprep": "1.0.1"
   },
+  "browserify": {
+    "transform": [
+      "brfs"
+    ]
+  },
+  "engine": [
+    "node >= v6.0.0"
+  ],
   "jest": {
     "testPathIgnorePatterns": [
       "/node_modules/",
