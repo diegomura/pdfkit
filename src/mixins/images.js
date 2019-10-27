@@ -8,9 +8,7 @@ export default {
 
   image(src, x, y, options) {
     let bh, bp, bw, image, ip, left, left1;
-    if (options == null) {
-      options = {};
-    }
+    if (options == null) options = {};
     if (typeof x === 'object') {
       options = x;
       x = null;
@@ -46,13 +44,16 @@ export default {
       const wp = w / image.width;
       w = image.width * wp;
       h = image.height * wp;
+
     } else if (options.height && !options.width) {
       const hp = h / image.height;
       w = image.width * hp;
       h = image.height * hp;
+
     } else if (options.scale) {
       w = image.width * options.scale;
       h = image.height * options.scale;
+
     } else if (options.fit) {
       [bw, bh] = Array.from(options.fit);
       bp = bw / bh;
@@ -64,6 +65,7 @@ export default {
         h = bh;
         w = bh * ip;
       }
+
     } else if (options.cover) {
       [bw, bh] = Array.from(options.cover);
       bp = bw / bh;

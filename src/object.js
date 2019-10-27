@@ -1,4 +1,11 @@
-import PDFReference from './reference';
+/*
+PDFObject - converts JavaScript types into their corresponding PDF types.
+By Devon Govett
+*/
+
+import PDFAbstractReference from './abstract_reference';
+
+const pad = (str, length) => (Array(length + 1).join('0') + str).slice(-length);
 
 const escapableRe = /[\n\r\t\b\f\(\)\\]/g;
 const escapable = {
@@ -9,16 +16,14 @@ const escapable = {
   '\f': '\\f',
   '\\': '\\\\',
   '(': '\\(',
-  ')': '\\)',
+  ')': '\\)'
 };
 
-const pad = (str, length) => (Array(length + 1).join('0') + str).slice(-length);
-
 // Convert little endian UTF-16 to big endian
-const swapBytes = function(buff) {
+const swapBytes = function (buff) {
   const l = buff.length;
   if (l & 0x01) {
-    throw new Error('Buffer length must be even');
+    throw new Error("Buffer length must be even");
   } else {
     for (let i = 0, end = l - 1; i < end; i += 2) {
       const a = buff[i];
@@ -31,7 +36,7 @@ const swapBytes = function(buff) {
 };
 
 class PDFObject {
-  static convert(object) {
+  static convert(object, encryptFn = null) {
     // String literals are converted to the PDF name type
     if (typeof object === 'string') {
       return `/${object}`;
@@ -49,10 +54,18 @@ class PDFObject {
       }
 
       // If so, encode it as big endian UTF-16
+      let stringBuffer;
       if (isUnicode) {
-        string = swapBytes(new Buffer(`\ufeff${string}`, 'utf16le')).toString(
-          'binary'
-        );
+        stringBuffer = swapBytes(new Buffer(`\ufeff${string}`, 'utf16le'));
+      } else {
+        stringBuffer = new Buffer(string, 'ascii');
+      }
+
+      // Encrypt the string when necessary
+      if (encryptFn) {
+        string = encryptFn(stringBuffer).toString('binary');
+      } else {
+        string = stringBuffer.toString('binary');
       }
 
       // Escape characters as required by the spec
@@ -63,46 +76,57 @@ class PDFObject {
       // Buffers are converted to PDF hex strings
     } else if (Buffer.isBuffer(object)) {
       return `<${object.toString('hex')}>`;
-    } else if (object instanceof PDFReference) {
+
+    } else if (object instanceof PDFAbstractReference) {
       return object.toString();
+
     } else if (object instanceof Date) {
-      return (
-        `(D:${pad(object.getUTCFullYear(), 4)}` +
+      let string = `D:${pad(object.getUTCFullYear(), 4)}` +
         pad(object.getUTCMonth() + 1, 2) +
         pad(object.getUTCDate(), 2) +
         pad(object.getUTCHours(), 2) +
         pad(object.getUTCMinutes(), 2) +
-        pad(object.getUTCSeconds(), 2) +
-        'Z)'
-      );
+        pad(object.getUTCSeconds(), 2) + 'Z';
+
+      // Encrypt the string when necessary
+      if (encryptFn) {
+        string = encryptFn(new Buffer(string, 'ascii')).toString('binary');
+
+        // Escape characters as required by the spec
+        string = string.replace(escapableRe, c => escapable[c]);
+      }
+
+      return `(${string})`;
+
     } else if (Array.isArray(object)) {
-      const items = Array.from(object)
-        .map(e => PDFObject.convert(e))
-        .join(' ');
+      const items = (object.map((e) => PDFObject.convert(e, encryptFn))).join(' ');
       return `[${items}]`;
+
     } else if ({}.toString.call(object) === '[object Object]') {
       const out = ['<<'];
       for (let key in object) {
         const val = object[key];
-        out.push(`/${key} ${PDFObject.convert(val)}`);
+        out.push(`/${key} ${PDFObject.convert(val, encryptFn)}`);
       }
 
       out.push('>>');
       return out.join('\n');
+
     } else if (typeof object === 'number') {
       return PDFObject.number(object);
+
     } else {
       return `${object}`;
     }
   }
 
   static number(n) {
-    if (n > -1e21 && n < 1e21) {
+    if ((n > -1e21) && (n < 1e21)) {
       return Math.round(n * 1e6) / 1e6;
     }
 
     throw new Error(`unsupported number: ${n}`);
   }
-}
+};
 
 export default PDFObject;

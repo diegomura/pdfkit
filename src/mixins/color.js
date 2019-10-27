@@ -1,23 +1,30 @@
+import Gradient from '../gradient';
+
+const {
+  PDFGradient,
+  PDFLinearGradient,
+  PDFRadialGradient
+} = Gradient;
+
 export default {
   initColor() {
     // The opacity dictionaries
     this._opacityRegistry = {};
     this._opacityCount = 0;
-    return (this._gradCount = 0);
+    return this._gradCount = 0;
   },
 
   _normalizeColor(color) {
-    let part;
+    if (color instanceof PDFGradient) {
+      return color;
+    }
+
     if (typeof color === 'string') {
       if (color.charAt(0) === '#') {
-        if (color.length === 4) {
-          color = color.replace(
-            /#([0-9A-F])([0-9A-F])([0-9A-F])/i,
-            '#$1$1$2$2$3$3'
-          );
-        }
+        if (color.length === 4) { color = color.replace(/#([0-9A-F])([0-9A-F])([0-9A-F])/i, "#$1$1$2$2$3$3"); }
         const hex = parseInt(color.slice(1), 16);
         color = [hex >> 16, (hex >> 8) & 0xff, hex & 0xff];
+
       } else if (namedColors[color]) {
         color = namedColors[color];
       }
@@ -26,25 +33,11 @@ export default {
     if (Array.isArray(color)) {
       // RGB
       if (color.length === 3) {
-        color = (() => {
-          const result = [];
-          for (part of Array.from(color)) {
-            result.push(part / 255);
-          }
-          return result;
-        })();
-
+        color = color.map(part => part / 255);
         // CMYK
       } else if (color.length === 4) {
-        color = (() => {
-          const result1 = [];
-          for (part of Array.from(color)) {
-            result1.push(part / 100);
-          }
-          return result1;
-        })();
+        color = color.map(part => part / 100);
       }
-
       return color;
     }
 
@@ -53,17 +46,20 @@ export default {
 
   _setColor(color, stroke) {
     color = this._normalizeColor(color);
-    if (!color) {
-      return false;
-    }
+    if (!color) { return false; }
 
     const op = stroke ? 'SCN' : 'scn';
 
-    const space = color.length === 4 ? 'DeviceCMYK' : 'DeviceRGB';
-    this._setColorSpace(space, stroke);
+    if (color instanceof PDFGradient) {
+      this._setColorSpace('Pattern', stroke);
+      color.apply(op);
+    } else {
+      const space = color.length === 4 ? 'DeviceCMYK' : 'DeviceRGB';
+      this._setColorSpace(space, stroke);
 
-    color = color.join(' ');
-    this.addContent(`${color} ${op}`);
+      color = color.join(' ');
+      this.addContent(`${color} ${op}`);
+    }
 
     return true;
   },
@@ -75,9 +71,7 @@ export default {
 
   fillColor(color, opacity) {
     const set = this._setColor(color, false);
-    if (set) {
-      this.fillOpacity(opacity);
-    }
+    if (set) { this.fillOpacity(opacity); }
 
     // save this for text wrapper, which needs to reset
     // the fill color on new pages
@@ -87,9 +81,7 @@ export default {
 
   strokeColor(color, opacity) {
     const set = this._setColor(color, true);
-    if (set) {
-      this.strokeOpacity(opacity);
-    }
+    if (set) { this.strokeOpacity(opacity); }
     return this;
   },
 
@@ -110,29 +102,20 @@ export default {
 
   _doOpacity(fillOpacity, strokeOpacity) {
     let dictionary, name;
-    if (fillOpacity == null && strokeOpacity == null) {
-      return;
-    }
+    if ((fillOpacity == null) && (strokeOpacity == null)) { return; }
 
-    if (fillOpacity != null) {
-      fillOpacity = Math.max(0, Math.min(1, fillOpacity));
-    }
-    if (strokeOpacity != null) {
-      strokeOpacity = Math.max(0, Math.min(1, strokeOpacity));
-    }
+    if (fillOpacity != null) { fillOpacity = Math.max(0, Math.min(1, fillOpacity)); }
+    if (strokeOpacity != null) { strokeOpacity = Math.max(0, Math.min(1, strokeOpacity)); }
     const key = `${fillOpacity}_${strokeOpacity}`;
 
     if (this._opacityRegistry[key]) {
-      [dictionary, name] = Array.from(this._opacityRegistry[key]);
+      [dictionary, name] = this._opacityRegistry[key];
     } else {
-      dictionary = { Type: 'ExtGState' };
+      dictionary =
+        { Type: 'ExtGState' };
 
-      if (fillOpacity != null) {
-        dictionary.ca = fillOpacity;
-      }
-      if (strokeOpacity != null) {
-        dictionary.CA = strokeOpacity;
-      }
+      if (fillOpacity != null) { dictionary.ca = fillOpacity; }
+      if (strokeOpacity != null) { dictionary.CA = strokeOpacity; }
 
       dictionary = this.ref(dictionary);
       dictionary.end();
@@ -144,6 +127,14 @@ export default {
     this.page.ext_gstates[name] = dictionary;
     return this.addContent(`/${name} gs`);
   },
+
+  linearGradient(x1, y1, x2, y2) {
+    return new PDFLinearGradient(this, x1, y1, x2, y2);
+  },
+
+  radialGradient(x1, y1, r1, x2, y2, r2) {
+    return new PDFRadialGradient(this, x1, y1, r1, x2, y2, r2);
+  }
 };
 
 var namedColors = {
@@ -293,5 +284,5 @@ var namedColors = {
   white: [255, 255, 255],
   whitesmoke: [245, 245, 245],
   yellow: [255, 255, 0],
-  yellowgreen: [154, 205, 50],
+  yellowgreen: [154, 205, 50]
 };

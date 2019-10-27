@@ -13,9 +13,7 @@ class PNGImage {
 
   embed(document) {
     this.document = document;
-    if (this.obj) {
-      return;
-    }
+    if (this.obj) return;
 
     this.obj = this.document.ref({
       Type: 'XObject',
@@ -61,6 +59,7 @@ class PNGImage {
       // An array with N elements, where N is two times the number of color components.
       const val = this.image.transparency.greyscale;
       return (this.obj.data['Mask'] = [val, val]);
+
     } else if (this.image.transparency.rgb) {
       // Use Color Key Masking (spec section 4.8.5)
       // An array with N elements, where N is two times the number of color components.
@@ -71,6 +70,7 @@ class PNGImage {
       }
 
       return (this.obj.data['Mask'] = mask);
+
     } else if (this.image.transparency.indexed) {
       // Create a transparency SMask for the image based on the data
       // in the PLTE and tRNS sections. See below for details on SMasks.

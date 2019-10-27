@@ -1,5 +1,4 @@
 import fs from 'fs';
-import Data from './data';
 import JPEG from './image/jpeg';
 import PNG from './image/png';
 
@@ -11,8 +10,8 @@ class PDFImage {
     } else if (src instanceof ArrayBuffer) {
       data = new Buffer(new Uint8Array(src));
     } else {
-      let match = /^data:.+;base64,(.*)$/.exec(src);
-      if (match) {
+      let match;
+      if (match = /^data:.+;base64,(.*)$/.exec(src)) {
         data = new Buffer(match[1], 'base64');
       } else if (!BROWSER) {
         data = fs.readFileSync(src);

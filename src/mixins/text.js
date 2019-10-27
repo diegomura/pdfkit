@@ -47,7 +47,6 @@ export default {
     this._fragment(text, this.x, this.y, options)
   },
 
-
   _fragment(text, x, y, options) {
     text = ('' + text).replace(/\n/g, '')
 

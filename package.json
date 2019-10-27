@@ -14,7 +14,8 @@
     "url": "http://badassjs.com/"
   },
   "scripts": {
-    "build": "rollup -c",
+    "build": "rimraf ./dist && rollup -c",
+    "watch": "npm run prebuild && rimraf ./dist && rollup -c -w",
     "prepublish": "npm run build",
     "prebuild": "node ./src/font/data/compressData.js",
     "postbuild": "rimraf ./src/font/data/*.b64.afm"
@@ -28,13 +29,15 @@
     "lz-string": "^1.4.4"
   },
   "devDependencies": {
+    "babel-core": "^6.26.3",
     "babel-plugin-external-helpers": "^6.22.0",
+    "babel-preset-env": "^1.7.0",
     "babel-preset-es2015": "^6.24.1",
     "blob-stream": "^0.1.2",
     "iconv-lite": "^0.4.13",
     "rimraf": "^2.6.2",
     "rollup": "^0.52.2",
-    "rollup-plugin-babel": "^2.7.1",
+    "rollup-plugin-babel": "3",
     "rollup-plugin-bundle-size": "https://github.com/vimeo/rollup-plugin-bundle-size",
     "rollup-plugin-ignore": "^1.0.3",
     "rollup-plugin-json": "^2.1.0",

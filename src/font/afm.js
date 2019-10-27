@@ -1,5 +1,4 @@
-import fs from 'fs';
-import range from '../utils/range';
+import fs from 'fs'
 
 const WIN_ANSI_MAP = {
   402: 131,
@@ -28,8 +27,8 @@ const WIN_ANSI_MAP = {
   353: 154,
   376: 159,
   381: 142,
-  382: 158,
-};
+  382: 158
+}
 
 const characters = `\
 .notdef       .notdef        .notdef        .notdef
@@ -103,133 +102,130 @@ eth           ntilde         ograve         oacute
 ocircumflex   otilde         odieresis      divide
 oslash        ugrave         uacute         ucircumflex
 udieresis     yacute         thorn          ydieresis\
-`.split(/\s+/);
+`.split(/\s+/)
 
 class AFMFont {
   static open(filename) {
     if (BROWSER) {
-      throw new Error('AFMFont.open not available on browser build');
+      throw new Error('AFMFont.open not available on browser build')
     }
-    return new AFMFont(fs.readFileSync(filename, 'utf8'));
+    return new AFMFont(fs.readFileSync(filename, 'utf8'))
   }
 
   constructor(contents) {
-    this.contents = contents;
-    this.attributes = {};
-    this.glyphWidths = {};
-    this.boundingBoxes = {};
-    this.kernPairs = {};
+    this.contents = contents
+    this.attributes = {}
+    this.glyphWidths = {}
+    this.boundingBoxes = {}
+    this.kernPairs = {}
 
-    this.parse();
-    this.charWidths = range(0, 255, true).map(i => this.glyphWidths[characters[i]]);
-    this.bbox = Array.from(this.attributes['FontBBox'].split(/\s+/)).map(e => +e);
-    this.ascender = +(this.attributes['Ascender'] || 0);
-    this.descender = +(this.attributes['Descender'] || 0);
-    this.xHeight = +(this.attributes['XHeight'] || 0);
-    this.capHeight = +(this.attributes['CapHeight'] || 0);
-    this.lineGap = this.bbox[3] - this.bbox[1] - (this.ascender - this.descender);
+    this.parse()
+    // todo: remove charWidths since appears to not be used
+    this.charWidths = new Array(256)
+    for (let char = 0; char <= 255; char++) {
+      this.charWidths[char] = this.glyphWidths[characters[char]]
+    }
+
+    this.bbox = this.attributes['FontBBox'].split(/\s+/).map(e => +e)
+    this.ascender = +(this.attributes['Ascender'] || 0)
+    this.descender = +(this.attributes['Descender'] || 0)
+    this.xHeight = +(this.attributes['XHeight'] || 0)
+    this.capHeight = +(this.attributes['CapHeight'] || 0)
+    this.lineGap = this.bbox[3] - this.bbox[1] - (this.ascender - this.descender)
   }
 
   parse() {
-    let section = '';
+    let section = ''
     for (let line of Array.from(this.contents.split('\n'))) {
-      var match;
-      var a;
+      var match
+      var a
       if ((match = line.match(/^Start(\w+)/))) {
-        section = match[1];
-        continue;
+        section = match[1]
+        continue
       } else if ((match = line.match(/^End(\w+)/))) {
-        section = '';
-        continue;
+        section = ''
+        continue
       }
 
       switch (section) {
         case 'FontMetrics':
-          match = line.match(/(^\w+)\s+(.*)/);
-          var key = match[1];
-          var value = match[2];
+          match = line.match(/(^\w+)\s+(.*)/)
+          var key = match[1]
+          var value = match[2]
 
           if ((a = this.attributes[key])) {
             if (!Array.isArray(a)) {
-              a = this.attributes[key] = [a];
+              a = this.attributes[key] = [a]
             }
-            a.push(value);
+            a.push(value)
           } else {
-            this.attributes[key] = value;
+            this.attributes[key] = value
           }
-          break;
+          break
 
         case 'CharMetrics':
           if (!/^CH?\s/.test(line)) {
-            continue;
+            continue
           }
-          var name = line.match(/\bN\s+(\.?\w+)\s*;/)[1];
-          this.glyphWidths[name] = +line.match(/\bWX\s+(\d+)\s*;/)[1];
-          break;
+          var name = line.match(/\bN\s+(\.?\w+)\s*;/)[1]
+          this.glyphWidths[name] = +line.match(/\bWX\s+(\d+)\s*;/)[1]
+          break
 
         case 'KernPairs':
-          match = line.match(/^KPX\s+(\.?\w+)\s+(\.?\w+)\s+(-?\d+)/);
+          match = line.match(/^KPX\s+(\.?\w+)\s+(\.?\w+)\s+(-?\d+)/)
           if (match) {
-            this.kernPairs[match[1] + '\0' + match[2]] = parseInt(match[3]);
+            this.kernPairs[match[1] + '\0' + match[2]] = parseInt(match[3])
           }
-          break;
+          break
       }
     }
   }
 
   encodeText(text) {
-    const res = [];
-    for (
-      let i = 0, end = text.length, asc = 0 <= end;
-      asc ? i < end : i > end;
-      asc ? i++ : i--
-    ) {
-      let char = text.charCodeAt(i);
-      char = WIN_ANSI_MAP[char] || char;
-      res.push(char.toString(16));
+    const res = []
+    for (let i = 0, end = text.length, asc = 0 <= end; asc ? i < end : i > end; asc ? i++ : i--) {
+      let char = text.charCodeAt(i)
+      char = WIN_ANSI_MAP[char] || char
+      res.push(char.toString(16))
     }
 
-    return res;
+    return res
   }
 
   glyphsForString(string) {
-    const glyphs = [];
+    const glyphs = []
 
-    for (
-      let i = 0, end = string.length, asc = 0 <= end;
-      asc ? i < end : i > end;
-      asc ? i++ : i--
-    ) {
-      const charCode = string.charCodeAt(i);
-      glyphs.push(this.characterToGlyph(charCode));
+    for (let i = 0, end = string.length, asc = 0 <= end; asc ? i < end : i > end; asc ? i++ : i--) {
+      const charCode = string.charCodeAt(i)
+      glyphs.push(this.characterToGlyph(charCode))
     }
 
-    return glyphs;
+    return glyphs
   }
 
   characterToGlyph(character) {
-    return characters[WIN_ANSI_MAP[character] || character] || '.notdef';
+    return characters[WIN_ANSI_MAP[character] || character] || '.notdef'
   }
 
   widthOfGlyph(glyph) {
-    return this.glyphWidths[glyph] || 0;
+    return this.glyphWidths[glyph] || 0
   }
 
   getKernPair(left, right) {
-    return this.kernPairs[left + '\0' + right] || 0;
+    return this.kernPairs[left + '\0' + right] || 0
   }
 
   advancesForGlyphs(glyphs) {
-    const advances = [];
+    const advances = []
 
     for (let index = 0; index < glyphs.length; index++) {
-      const left = glyphs[index];
-      const right = glyphs[index + 1];
-      advances.push(this.widthOfGlyph(left) + this.getKernPair(left, right));
+      const left = glyphs[index]
+      const right = glyphs[index + 1]
+      advances.push(this.widthOfGlyph(left) + this.getKernPair(left, right))
     }
 
-    return advances;
+    return advances
   }
-};
+}
 
-export default AFMFont;
+export default AFMFont
