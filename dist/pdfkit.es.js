@@ -303,7 +303,7 @@ var PDFReference = function (_stream$Writable) {
 PDFNameTree - represents a name tree object
 */
 
-var PDFNameTree$1 = function () {
+var PDFNameTree = function () {
     function PDFNameTree() {
         classCallCheck(this, PDFNameTree);
 
@@ -439,7 +439,7 @@ var PDFObject = function () {
         // Buffers are converted to PDF hex strings
       } else if (Buffer.isBuffer(object)) {
         return '<' + object.toString('hex') + '>';
-      } else if (object instanceof PDFReference || object instanceof PDFNameTree$1) {
+      } else if (object instanceof PDFReference || object instanceof PDFNameTree) {
         return object.toString();
       } else if (object instanceof Date) {
         return '(D:' + pad(object.getUTCFullYear(), 4) + pad(object.getUTCMonth() + 1, 2) + pad(object.getUTCDate(), 2) + pad(object.getUTCHours(), 2) + pad(object.getUTCMinutes(), 2) + pad(object.getUTCSeconds(), 2) + 'Z)';

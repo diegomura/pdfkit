@@ -1,6 +1,7 @@
 import stream from 'stream';
 import PDFObject from './object';
 import PDFReference from './reference';
+import PDFNameTree from './name_tree';
 import PDFPage from './page';
 import Color from './mixins/color';
 import Vector from './mixins/vector';
