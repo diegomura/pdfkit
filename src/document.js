@@ -122,6 +122,7 @@ class PDFDocument extends stream.Readable {
     if ((args[0] === 'XYZ') && (args[2] !== null)) {
       args[2] = this.page.height - args[2];
     }
+    console.log('in addNamedDestination')
     args.unshift(this.page.dictionary);
     this._root.data.Names.data.Dests.add(name, args);
   }
