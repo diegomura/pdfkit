@@ -8,5 +8,4 @@ build/
 demo/bundle.js
 *.html
 !demo/browser.html
-dist
 *.b64.afm

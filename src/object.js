@@ -1,4 +1,5 @@
 import PDFReference from './reference';
+import PDFNameTree from './name_tree';
 
 const escapableRe = /[\n\r\t\b\f\(\)\\]/g;
 const escapable = {
@@ -15,7 +16,7 @@ const escapable = {
 const pad = (str, length) => (Array(length + 1).join('0') + str).slice(-length);
 
 // Convert little endian UTF-16 to big endian
-const swapBytes = function(buff) {
+const swapBytes = function (buff) {
   const l = buff.length;
   if (l & 0x01) {
     throw new Error('Buffer length must be even');
@@ -63,7 +64,7 @@ class PDFObject {
       // Buffers are converted to PDF hex strings
     } else if (Buffer.isBuffer(object)) {
       return `<${object.toString('hex')}>`;
-    } else if (object instanceof PDFReference) {
+    } else if (object instanceof PDFReference || object instanceof PDFNameTree) {
       return object.toString();
     } else if (object instanceof Date) {
       return (
