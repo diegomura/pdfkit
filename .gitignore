@@ -5,8 +5,8 @@ lib/font/tables/.DS_Store
 node-zlib/
 playground/
 build/
-dist
 demo/bundle.js
 *.html
 !demo/browser.html
+dist
 *.b64.afm
