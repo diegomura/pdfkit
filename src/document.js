@@ -1,6 +1,7 @@
 import stream from 'stream';
 import PDFObject from './object';
 import PDFReference from './reference';
+import PDFNameTree from './name_tree';
 import PDFPage from './page';
 import Color from './mixins/color';
 import Vector from './mixins/vector';
@@ -25,6 +26,11 @@ class PDFDocument extends stream.Readable {
     this._ended = false;
     this._offset = 0;
 
+
+    const Names = this.ref({
+      Dests: new PDFNameTree()
+    });
+
     this._root = this.ref({
       Type: 'Catalog',
       Pages: this.ref({
@@ -32,6 +38,7 @@ class PDFDocument extends stream.Readable {
         Count: 0,
         Kids: [],
       }),
+      Names
     });
 
     // The current page
@@ -108,6 +115,17 @@ class PDFDocument extends stream.Readable {
     }
   }
 
+  addNamedDestination(name, ...args) {
+    if (args.length === 0) {
+      args = ['XYZ', null, null, null];
+    }
+    if ((args[0] === 'XYZ') && (args[2] !== null)) {
+      args[2] = this.page.height - args[2];
+    }
+    args.unshift(this.page.dictionary);
+    this._root.data.Names.data.Dests.add(name, args);
+  }
+
   ref(data) {
     const ref = new PDFReference(this, this._offsets.length + 1, data);
     this._offsets.push(null); // placeholder for this object's offset once it is finalized
@@ -162,6 +180,7 @@ class PDFDocument extends stream.Readable {
 
     this._root.end();
     this._root.data.Pages.end();
+    this._root.data.Names.end();
 
     if (this._waiting === 0) {
       return this._finalize();
