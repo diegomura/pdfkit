@@ -1,6 +1,6 @@
 {
   "name": "@react-pdf/pdfkit",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "description": "A PDF generation library for Node.js",
   "main": "dist/pdfkit.cjs.js",
   "module": "dist/pdfkit.es.js",
